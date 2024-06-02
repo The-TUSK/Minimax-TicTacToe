@@ -1,8 +1,5 @@
-// Tic Tac Toe
 class Agent {
-    constructor() {
-
-    }
+    constructor() {}
 
     minimax(board, isMaximizing) {
         // Base cases - check if the game is over or a draw
@@ -15,27 +12,26 @@ class Agent {
             return 0; // the game is a draw
         }
 
-        // Recursive case - evaluate all possible moves and choose the best score
+        //Evaluate all posible moves and choose the best move, starting at 1, instead of creating cell i + 1
         if (isMaximizing) {
-            var bestScore = -Infinity;
-            for (var i = 0; i < board.cells.length; i++) {
-                var cell = i + 1;
-                if (board.cellFree(cell)) {
-                    var newBoard = board.clone();
-                    newBoard.move(cell);
-                    var score = this.minimax(newBoard, false);
+            let bestScore = -Infinity;
+            for (let i = 1; i <= board.cells.length; i++) {
+                if (board.cellFree(i)) {
+                    const newBoard = board.clone();
+                    newBoard.move(i);
+                    const score = this.minimax(newBoard, false);
                     bestScore = Math.max(bestScore, score);
                 }
             }
             return bestScore;
         } else {
-            var bestScore = Infinity;
-            for (var i = 0; i < board.cells.length; i++) {
-                var cell = i + 1;
-                if (board.cellFree(cell)) {
-                    var newBoard = board.clone();
-                    newBoard.move(cell);
-                    var score = this.minimax(newBoard, true);
+             //Evaluate all posible moves and choose the "worst" move/least optimal move, starting at 1, instead of creating cell i + 1
+            let bestScore = Infinity;
+            for (let i = 1; i <= board.cells.length; i++) {
+                if (board.cellFree(i)) {
+                    const newBoard = board.clone();
+                    newBoard.move(i);
+                    const score = this.minimax(newBoard, true);
                     bestScore = Math.min(bestScore, score);
                 }
             }
@@ -44,37 +40,37 @@ class Agent {
     }
 
     selectMove(board) {
-        // Define the initial best score and move
-        var maxScore = -Infinity;
-        var maxMove = null;
+        //check current player and check whether we want the max score or the least score
+        let bestScore = board.playerOne ? -Infinity : Infinity;
+        //set best move to null, edit result to bestscore to leastscore, depending on the current player
+        let bestMove = null;
 
-        var minScore = Infinity;
-        var minMove = null;
+        //loop through each cell to evaluate best move, starting at 1, instead of creating cell i + 1
+        for (let i = 1; i <= board.cells.length; i++) {
+            if (board.cellFree(i)) {
+                //make move in current cell
+                const newBoard = board.clone();
+                newBoard.move(i);
 
-        // Loop through each cell to evaluate the best move
-        for (var i = 0; i < board.cells.length; i++) {
-            var cell = i + 1;
-            if (board.cellFree(cell)) {
-                // Make a move on the current cell
-                var newBoard = board.clone();
-                newBoard.move(cell);
-
-                // Calculate the score for the current move
-                var score = this.minimax(newBoard, !board.playerOne);
-
-                // Update the best move if the current move has a higher score
-                if (score > maxScore) {
-                    maxScore = score;
-                    maxMove = cell;
-                }
-                if (score < minScore) {
-                    minScore = score;
-                    minMove = cell;
+                //evaluate score for the move
+                const score = this.minimax(newBoard, !board.playerOne);
+                
+                //check if the current players is playerOne, if they are give them the best score
+                if (board.playerOne) {
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                } else {
+                    //if current player is not playerOne, look for the "worst" move
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
                 }
             }
         }
 
-        return board.playerOne ? maxMove : minMove;
+        return bestMove;
     }
-
 }
